@@ -5,7 +5,7 @@ import tarfile
 from six.moves import urllib
 import sys
 import numpy as np
-import cPickle
+from six.moves import cPickle
 import os
 import cv2
 
@@ -60,12 +60,12 @@ def _read_one_batch(path, is_random_label):
     :return: image numpy arrays and label numpy arrays
     '''
     fo = open(path, 'rb')
-    dicts = cPickle.load(fo)
+    dicts = cPickle.load(fo, encoding='bytes')
     fo.close()
 
-    data = dicts['data']
+    data = dicts[b'data']
     if is_random_label is False:
-        label = np.array(dicts['labels'])
+        label = np.array(dicts[b'labels'])
     else:
         labels = np.random.randint(low=0, high=10, size=10000)
         label = np.array(labels)
@@ -85,7 +85,7 @@ def read_in_all_images(address_list, shuffle=True, is_random_label = False):
     label = np.array([])
 
     for address in address_list:
-        print 'Reading images from ' + address
+        print('Reading images from ' + address)
         batch_data, batch_label = _read_one_batch(address, is_random_label)
         # Concatenate along axis 0 by default
         data = np.concatenate((data, batch_data))
@@ -100,7 +100,7 @@ def read_in_all_images(address_list, shuffle=True, is_random_label = False):
 
 
     if shuffle is True:
-        print 'Shuffling'
+        print('Shuffling')
         order = np.random.permutation(num_data)
         data = data[order, ...]
         label = label[order]
